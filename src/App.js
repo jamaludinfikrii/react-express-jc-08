@@ -35,8 +35,8 @@ class App extends Component {
   onBtnSave = (param) => {
     Axios.put('http://localhost:2000/edittodo/' + param , {todo : this.refs.editTodo.value})
     .then((res) => {
-      alert(res.data)
-      this.setState({selectEdit : 0})
+      alert('Suksess')
+      this.setState({selectEdit : 0 , todo : res.data})
     } )
 
   }
@@ -67,7 +67,7 @@ class App extends Component {
           <td>
             <input type='button' className='btn btn-primary mr-3'  onClick={()=> 
               this.setState({selectEdit: val.id})} value='edit'/>
-            <input type='button' className='btn btn-danger' value='delete'/>
+            <input type='button' className='btn btn-danger' onClick={() => this.onBtnDelete(val.id)} value='delete'/>
           </td>
         </tr>
       )
@@ -86,6 +86,15 @@ class App extends Component {
       alert('add data success')
       this.refs.todo.value = ''
     })
+  }
+
+  onBtnDelete =(terserah)=>{
+    Axios.delete('http://localhost:2000/deletetodo/' + terserah)
+    .then((res) => {
+      alert(res.data)
+      this.getItem()
+    })
+
   }
 
   render() {
