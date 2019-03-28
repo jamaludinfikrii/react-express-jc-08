@@ -3,7 +3,7 @@ import './App.css';
 import Axios from 'axios';
 
 class App extends Component {
-  state = {todo : [] , users:[], user : {}}
+  state = {todo : [] ,users : [],selectEdit :0}
   componentDidMount(){
     this.getItem()
     this.getUser()
@@ -32,13 +32,43 @@ class App extends Component {
     return jsx
   }
 
+  onBtnSave = (param) => {
+    Axios.put('http://localhost:2000/edittodo/' + param , {todo : this.refs.editTodo.value})
+    .then((res) => {
+      alert(res.data)
+      this.setState({selectEdit : 0})
+    } )
+
+  }
+
   renderTodoJsx = () => {
     var jsx =  this.state.todo.map((val, index)=>{
+      if(val.id === this.state.selectEdit){
+        return(
+          <tr>
+            <td>{index +1}</td>
+            <td>{val.username}</td>
+            <td>
+              <input type='text' className='form-control' ref='editTodo' defaultValue={val.to_do}/>
+            </td>
+            <td>
+              <input type='button' className='btn btn-success mr-3' onClick={() => this.onBtnSave(val.id)} value='save'/>
+              <input type='button' className='btn btn-danger' onClick={()=>this.setState({selectEdit : 0})} value='cancel'/>
+            </td> 
+          </tr>
+        )
+
+      }
       return(
         <tr>
           <td>{index +1}</td>
           <td>{val.username}</td>
           <td>{val.to_do}</td>
+          <td>
+            <input type='button' className='btn btn-primary mr-3'  onClick={()=> 
+              this.setState({selectEdit: val.id})} value='edit'/>
+            <input type='button' className='btn btn-danger' value='delete'/>
+          </td>
         </tr>
       )
     })
@@ -52,8 +82,8 @@ class App extends Component {
 
     Axios.post('http://localhost:2000/addtodo' , newData)
     .then((res)=>{
-      alert(res.data)
-      this.getItem()
+      this.setState({todo : res.data})
+      alert('add data success')
       this.refs.todo.value = ''
     })
   }
@@ -67,6 +97,7 @@ class App extends Component {
             <td>NO</td>
             <td>User</td>
             <td>Todo</td>
+            <td>Act</td>
           </tr>
           {this.renderTodoJsx()}
 
